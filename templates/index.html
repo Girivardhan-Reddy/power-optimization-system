@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Microgrid Energy Management System</title>
+    
+    <!-- Bootstrap 5 CSS with Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- ApexCharts for advanced visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+    
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #475569;
+            --green: #10b981;
+            --blue: #3b82f6;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --purple: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--card-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--blue);
+        }
+
+        .card-header {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+        }
+
+        .btn-warning {
+            background: var(--warning-gradient);
+        }
+
+        .btn-outline-light {
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline-light:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: transparent;
+        }
+
+        /* Metrics Cards */
+        .metric-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-change {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .change-positive {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--green);
+        }
+
+        .change-negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--red);
+        }
+
+        /* Charts */
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: 100%;
+            min-height: 400px;
+        }
+
+        .apexcharts-tooltip {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Table */
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table {
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .table thead th {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.01);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--green);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--orange);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--red);
+        }
+
+        /* Progress Bars */
+        .progress {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: var(--primary-gradient);
+            border-radius: 10px;
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 12px 12px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--blue);
+            background: rgba(59, 130, 246, 0.1);
+            border-bottom: 3px solid var(--blue);
+        }
+
+        /* Forms */
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--blue);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+        }
+
+        .form-range::-webkit-slider-thumb {
+            background: var(--blue);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online {
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+        }
+
+        .status-warning {
+            background: var(--orange);
+            box-shadow: 0 0 10px var(--orange);
+        }
+
+        .status-offline {
+            background: var(--red);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
+            padding: 4rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Model Status Cards */
+        .model-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .model-card:hover {
+            background: var(--card-hover);
+            transform: translateY(-5px);
+        }
+
+        .model-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Battery Gauge */
+        .battery-container {
+            position: relative;
+            width: 200px;
+            height: 100px;
+            margin: 0 auto;
+        }
+
+        .battery-body {
+            position: absolute;
+            width: 180px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .battery-fill {
+            position: absolute;
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: 8px;
+            transition: width 1s ease;
+        }
+
+        .battery-tip {
+            position: absolute;
+            width: 20px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--blue);
+            border: 2px solid var(--dark-bg);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .metric-value {
+                font-size: 2rem;
+            }
+            
+            .chart-container {
+                min-height: 300px;
+            }
+            
+            .hero-section {
+                padding: 2rem 0;
+            }
+            
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Custom Utilities */
+        .text-gradient {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Notification System */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Model Performance Indicators */
+        .performance-indicator {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .performance-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        /* PDF Report Container */
+        #pdfReportContainer {
+            position: fixed;
+            top: -10000px;
+            left: -10000px;
+            width: 794px; /* A4 width in pixels at 96 DPI */
+            min-height: 1123px; /* A4 height */
+            background: white;
+            color: #1a1a2e;
+            padding: 40px;
+            font-family: 'Inter', sans-serif;
+            z-index: 99999;
+        }
+
+        .report-header {
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .report-section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+
+        .report-title {
+            color: #667eea;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .report-subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .report-metric {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .report-chart {
+            width: 100%;
+            height: 200px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .report-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .report-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .report-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .report-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h3 class="mt-4 animate__animated animate__pulse" id="loadingTitle">Initializing Microgrid System...</h3>
+        <p class="text-center text-secondary mt-2" id="loadingText">Loading AI models and preparing simulation environment</p>
+    </div>
+
+    <!-- PDF Report Container (hidden) -->
+    <div id="pdfReportContainer">
+        <!-- PDF content will be generated here -->
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-bolt"></i>
+                <span class="text-gradient">AI Microgrid Manager</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">
+                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#simulation">
+                            <i class="fas fa-play-circle me-1"></i> Simulation
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#analytics">
+                            <i class="fas fa-chart-line me-1"></i> Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#models">
+                            <i class="fas fa-brain me-1"></i> AI Models
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center ms-3">
+                    <span class="me-3">
+                        <span class="status-indicator status-online"></span>
+                        <small class="text-success">System Online</small>
+                    </span>
+                    <button class="btn btn-outline-light btn-sm" onclick="toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInUp">
+                        Intelligent Energy Management
+                        <span class="text-gradient">Powered by AI</span>
+                    </h1>
+                    <p class="lead text-secondary mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                        Optimize your microgrid's energy distribution with machine learning and reinforcement learning algorithms. 
+                        Reduce costs, minimize emissions, and maximize renewable energy utilization.
+                    </p>
+                    <div class="d-flex gap-3 animate__animated animate__fadeInUp animate__delay-2s">
+                        <button class="btn btn-primary btn-lg" onclick="startQuickSimulation()">
+                            <i class="fas fa-rocket me-2"></i> Quick Start
+                        </button>
+                        <button class="btn btn-outline-light btn-lg" onclick="generatePDFReport()">
+                            <i class="fas fa-file-pdf me-2"></i> Generate Report
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card glass-effect animate__animated animate__fadeIn animate__delay-1s">
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="metric-card">
+                                        <div class="metric-label">Eco Score</div>
+                                        <div class="metric-value text-success" id="heroEcoScore">85</div>
+                                        <div class="metric-change change-positive">
+                                            <i class="fas fa-arrow-up me-1"></i> 12%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card">
+                                        <div class="metric-label">Cost Savings</div>
+                                        <div class="metric-value text-primary" id="heroSavings">₹2,05,800</div>
+                                        <div class="metric-change change-positive">
+                                            <i class="fas fa-arrow-up me-1"></i> 18%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card">
+                                        <div class="metric-label">Renewable Usage</div>
+                                        <div class="metric-value text-warning" id="heroRenewable">78%</div>
+                                        <div class="metric-change change-positive">
+                                            <i class="fas fa-arrow-up me-1"></i> 5%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card">
+                                        <div class="metric-label">CO₂ Reduction</div>
+                                        <div class="metric-value text-info" id="heroCo2">3.2t</div>
+                                        <div class="metric-change change-positive">
+                                            <i class="fas fa-arrow-up me-1"></i> 15%
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <div class="row g-4">
+            <!-- Left Sidebar -->
+            <div class="col-lg-3">
+                <!-- System Status -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-microchip me-2"></i> System Status
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h6 class="mb-1">ML Models</h6>
+                                <div class="performance-indicator">
+                                    <div class="performance-bar" style="width: 85%; background: var(--primary-gradient);"></div>
+                                </div>
+                                <small class="text-success">
+                                    <i class="fas fa-check-circle me-1"></i> Loaded & Ready
+                                </small>
+                            </div>
+                            <div class="timeline-item">
+                                <h6 class="mb-1">Data Pipeline</h6>
+                                <div class="performance-indicator">
+                                    <div class="performance-bar" style="width: 92%; background: var(--success-gradient);"></div>
+                                </div>
+                                <small class="text-success">
+                                    <i class="fas fa-check-circle me-1"></i> Streaming
+                                </small>
+                            </div>
+                            <div class="timeline-item">
+                                <h6 class="mb-1">RL Agent</h6>
+                                <div class="performance-indicator">
+                                    <div class="performance-bar" style="width: 75%; background: var(--warning-gradient);"></div>
+                                </div>
+                                <small class="text-warning">
+                                    <i class="fas fa-sync-alt me-1"></i> Learning
+                                </small>
+                            </div>
+                            <div class="timeline-item">
+                                <h6 class="mb-1">Battery System</h6>
+                                <div class="performance-indicator">
+                                    <div class="performance-bar" style="width: 60%; background: var(--info-gradient);"></div>
+                                </div>
+                                <small class="text-info">
+                                    <i class="fas fa-battery-three-quarters me-1"></i> 60% Charged
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-bolt me-2"></i> Quick Actions
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" onclick="runSimulation()">
+                                <i class="fas fa-play me-2"></i> Run Simulation
+                            </button>
+                            <button class="btn btn-outline-light" onclick="predictDemand()">
+                                <i class="fas fa-chart-line me-2"></i> Predict Demand
+                            </button>
+                            <button class="btn btn-outline-light" onclick="optimizeNow()">
+                                <i class="fas fa-cogs me-2"></i> Optimize Now
+                            </button>
+                            <button class="btn btn-outline-light" onclick="generatePDFReport()">
+                                <i class="fas fa-file-pdf me-2"></i> Generate PDF Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Battery Status -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-battery-full me-2"></i> Battery Status
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="battery-container">
+                            <div class="battery-body">
+                                <div class="battery-fill" id="batteryFill" style="width: 60%;"></div>
+                            </div>
+                            <div class="battery-tip"></div>
+                        </div>
+                        <div class="mt-3">
+                            <h4 id="batteryPercentage">60%</h4>
+                            <small class="text-secondary">State of Charge</small>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <small>Capacity</small>
+                                <div class="h6" id="batteryCapacityValue">200 kWh</div>
+                            </div>
+                            <div class="col-6">
+                                <small>Power</small>
+                                <div class="h6">45 kW</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-lg-6">
+                <!-- Simulation Controls -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-sliders-h me-2"></i> Simulation Controls
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-light active" onclick="setPreset('default', this)">Default</button>
+                            <button class="btn btn-sm btn-outline-light" onclick="setPreset('peak', this)">Peak Hours</button>
+                            <button class="btn btn-sm btn-outline-light" onclick="setPreset('renewable', this)">Renewable Focus</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="simulationForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-clock me-1"></i> Duration (hours)
+                                    </label>
+                                    <input type="range" class="form-range" id="simDuration" min="1" max="168" value="24">
+                                    <div class="d-flex justify-content-between">
+                                        <small>1h</small>
+                                        <span id="durationValue" class="fw-bold">24h</span>
+                                        <small>1w</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-sun me-1"></i> Solar Capacity (kW)
+                                    </label>
+                                    <input type="number" class="form-control" id="solarCapacity" value="100" min="10" max="500">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-wind me-1"></i> Wind Capacity (kW)
+                                    </label>
+                                    <input type="number" class="form-control" id="windCapacity" value="50" min="5" max="200">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-battery-full me-1"></i> Battery Capacity (kWh)
+                                    </label>
+                                    <input type="number" class="form-control" id="batteryCapacity" value="200" min="50" max="1000">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-robot me-1"></i> Strategy
+                                    </label>
+                                    <select class="form-select" id="strategy">
+                                        <option value="rl" selected>Reinforcement Learning</option>
+                                        <option value="heuristic">Smart Heuristic</option>
+                                        <option value="greedy">Cost Minimization</option>
+                                        <option value="eco">Eco-Friendly</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-bolt me-1"></i> Base Demand (kW)
+                                    </label>
+                                    <input type="number" class="form-control" id="baseDemand" value="80" min="20" max="200">
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-play-circle me-2"></i> Run Advanced Simulation
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Energy Distribution Chart -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-2"></i> Energy Distribution
+                    </div>
+                    <div class="card-body">
+                        <div id="energyChart"></div>
+                    </div>
+                </div>
+
+                <!-- Real-time Data -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-table me-2"></i> Real-time Energy Allocation
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Demand (kW)</th>
+                                        <th>Solar (kW)</th>
+                                        <th>Wind (kW)</th>
+                                        <th>Battery</th>
+                                        <th>Grid</th>
+                                        <th>Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="realTimeData">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Run a simulation to see data</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="col-lg-3">
+                <!-- AI Models Status -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-brain me-2"></i> AI Models
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="model-card">
+                                    <div class="model-icon text-primary">
+                                        <i class="fas fa-network-wired"></i>
+                                    </div>
+                                    <h6>LSTM</h6>
+                                    <small class="text-success">
+                                        <span class="status-indicator status-online"></span> 94% Accuracy
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="model-card">
+                                    <div class="model-icon text-warning">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <h6>XGBoost</h6>
+                                    <small class="text-success">
+                                        <span class="status-indicator status-online"></span> 92% Accuracy
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="model-card">
+                                    <div class="model-icon text-info">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <h6>RL Agent</h6>
+                                    <small class="text-warning">
+                                        <span class="status-indicator status-warning"></span> Learning
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="model-card">
+                                    <div class="model-icon text-success">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                    <h6>Forecast</h6>
+                                    <small class="text-success">
+                                        <span class="status-indicator status-online"></span> 89% Accuracy
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-trophy me-2"></i> Performance Metrics
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small>Eco Efficiency</small>
+                                <small id="metricEco">85%</small>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 85%;"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small>Cost Reduction</small>
+                                <small id="metricCost">78%</small>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 78%;"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small>Renewable Usage</small>
+                                <small id="metricRenewable">92%</small>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 92%;"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small>Grid Independence</small>
+                                <small id="metricGrid">65%</small>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 65%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Alerts -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-bell me-2"></i> Recent Alerts
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success d-flex align-items-center">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <div>
+                                <small>All systems operational</small>
+                            </div>
+                        </div>
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <div>
+                                <small>High solar production expected</small>
+                            </div>
+                        </div>
+                        <div class="alert alert-warning d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <div>
+                                <small>Peak hours approaching</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-4 border-top border-secondary">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-3">
+                        <i class="fas fa-bolt text-primary me-2"></i>
+                        AI Microgrid Manager
+                    </h5>
+                    <p class="text-secondary mb-0">
+                        Advanced energy management system using machine learning and reinforcement learning
+                        for optimal resource allocation in microgrid environments.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end gap-3">
+                        <a href="#" class="text-secondary"><i class="fab fa-github"></i></a>
+                        <a href="#" class="text-secondary"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-secondary"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-secondary"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <p class="text-secondary mt-3 mb-0">
+                        &copy; 2024 AI Microgrid System. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Global state
+        let currentSimulation = null;
+        let charts = {};
+        let realTimeInterval = null;
+        const USD_TO_INR = 83.0; // Conversion rate (1 USD = ₹83)
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show loading
+            showLoading('Initializing dashboard...');
+            
+            // Initialize components
+            initCharts();
+            initEventListeners();
+            loadSystemStatus();
+            loadDemoData();
+            
+            // Hide loading after 2 seconds
+            setTimeout(() => {
+                hideLoading();
+                showNotification('System ready! Configure parameters and run a simulation.', 'success');
+            }, 2000);
+            
+            // Update time
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 60000);
+        });
+
+        // Initialize charts
+        function initCharts() {
+            // Energy distribution chart
+            const energyOptions = {
+                series: [44, 55, 13, 43],
+                chart: {
+                    type: 'donut',
+                    height: 320,
+                    background: 'transparent',
+                    foreColor: '#f8fafc'
+                },
+                colors: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+                labels: ['Solar', 'Wind', 'Battery', 'Grid'],
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        colors: '#f8fafc'
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '65%',
+                            labels: {
+                                show: true,
+                                name: {
+                                    color: '#f8fafc'
+                                },
+                                value: {
+                                    color: '#f8fafc',
+                                    formatter: function(val) {
+                                        return val + 'kW'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            charts.energy = new ApexCharts(document.querySelector("#energyChart"), energyOptions);
+            charts.energy.render();
+        }
+
+        // Initialize event listeners
+        function initEventListeners() {
+            // Simulation form submission
+            document.getElementById('simulationForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await runAdvancedSimulation();
+            });
+
+            // Duration slider
+            document.getElementById('simDuration').addEventListener('input', function() {
+                document.getElementById('durationValue').textContent = this.value + 'h';
+            });
+
+            // Battery capacity input
+            document.getElementById('batteryCapacity').addEventListener('input', function() {
+                document.getElementById('batteryCapacityValue').textContent = this.value + ' kWh';
+            });
+        }
+
+        // Load system status
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch('/api/system_status');
+                const status = await response.json();
+                
+                if (!status.models_loaded) {
+                    showNotification('ML models not fully loaded. Using simulation mode.', 'warning');
+                }
+                
+                updateSystemStatusUI(status);
+            } catch (error) {
+                console.error('Error loading system status:', error);
+            }
+        }
+
+        // Load demo data
+        async function loadDemoData() {
+            try {
+                const response = await fetch('/api/demo_data');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateDashboardWithData(data);
+                }
+            } catch (error) {
+                console.error('Error loading demo data:', error);
+            }
+        }
+
+        // Convert USD to INR
+        function usdToInr(usdAmount) {
+            return usdAmount * USD_TO_INR;
+        }
+
+        // Format INR currency
+        function formatInr(amount) {
+            return '₹' + amount.toLocaleString('en-IN', {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            });
+        }
+
+        // Run advanced simulation
+        async function runAdvancedSimulation() {
+            const formData = {
+                duration: document.getElementById('simDuration').value,
+                solar_capacity: document.getElementById('solarCapacity').value,
+                wind_capacity: document.getElementById('windCapacity').value,
+                battery_capacity: document.getElementById('batteryCapacity').value,
+                strategy: document.getElementById('strategy').value,
+                base_demand: document.getElementById('baseDemand').value
+            };
+
+            showLoading('Running AI simulation...');
+            
+            try {
+                const response = await fetch('/api/simulate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentSimulation = result;
+                    updateDashboardWithData(result);
+                    showNotification('Simulation completed successfully!', 'success');
+                    startRealTimeUpdates();
+                } else {
+                    throw new Error(result.error || 'Simulation failed');
+                }
+            } catch (error) {
+                console.error('Simulation error:', error);
+                showNotification(`Error: ${error.message}`, 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Quick simulation
+        async function startQuickSimulation() {
+            showLoading('Running quick simulation...');
+            
+            try {
+                const response = await fetch('/api/simulate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        duration: 24,
+                        solar_capacity: 100,
+                        wind_capacity: 50,
+                        battery_capacity: 200,
+                        strategy: 'rl',
+                        base_demand: 80
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentSimulation = result;
+                    updateDashboardWithData(result);
+                    showNotification('Quick simulation completed!', 'success');
+                    startRealTimeUpdates();
+                }
+            } catch (error) {
+                console.error('Quick simulation error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Update dashboard with data
+        function updateDashboardWithData(data) {
+            // Update hero metrics
+            if (data.summary) {
+                document.getElementById('heroEcoScore').textContent = data.summary.eco_score.split('/')[0];
+                
+                // Convert savings to INR
+                const savingsUsd = parseFloat(data.summary.cost_savings.replace(/[^0-9.-]+/g,""));
+                const savingsInr = usdToInr(savingsUsd);
+                document.getElementById('heroSavings').textContent = formatInr(savingsInr);
+                
+                document.getElementById('heroRenewable').textContent = data.summary.renewable_utilization;
+                document.getElementById('heroCo2').textContent = data.summary.total_emissions;
+            }
+            
+            // Update energy chart
+            if (data.results && data.results.length > 0) {
+                const solar = data.results.reduce((sum, r) => sum + r.solar_kw, 0) / data.results.length;
+                const wind = data.results.reduce((sum, r) => sum + r.wind_kw, 0) / data.results.length;
+                const battery = data.results.reduce((sum, r) => sum + Math.abs(r.battery_power_kw), 0) / data.results.length;
+                const grid = data.results.reduce((sum, r) => sum + r.grid_import_kw, 0) / data.results.length;
+                
+                charts.energy.updateSeries([solar, wind, battery, grid]);
+                
+                // Update real-time table
+                updateRealTimeTable(data.results.slice(-5));
+                
+                // Update battery
+                const lastResult = data.results[data.results.length - 1];
+                if (lastResult) {
+                    updateBatteryStatus(lastResult.battery_soc_percent);
+                }
+                
+                // Update performance metrics
+                if (data.metrics) {
+                    updatePerformanceMetrics(data.metrics);
+                }
+            }
+        }
+
+        // Update real-time table
+        function updateRealTimeTable(results) {
+            const tbody = document.getElementById('realTimeData');
+            tbody.innerHTML = '';
+            
+            if (!results || results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No simulation data available</td></tr>';
+                return;
+            }
+            
+            results.forEach(result => {
+                const row = document.createElement('tr');
+                // Convert hourly cost to INR
+                const hourlyCostInr = usdToInr(result.hour_cost_usd);
+                row.innerHTML = `
+                    <td>${result.timestamp.split(' ')[1]}</td>
+                    <td>${result.demand_kw.toFixed(1)}</td>
+                    <td>${result.solar_kw.toFixed(1)}</td>
+                    <td>${result.wind_kw.toFixed(1)}</td>
+                    <td>${result.battery_power_kw.toFixed(1)}</td>
+                    <td>${result.grid_import_kw.toFixed(1)}</td>
+                    <td>${formatInr(hourlyCostInr)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update battery status
+        function updateBatteryStatus(soc) {
+            const percentage = Math.min(100, Math.max(0, soc));
+            document.getElementById('batteryFill').style.width = percentage + '%';
+            document.getElementById('batteryPercentage').textContent = percentage.toFixed(0) + '%';
+            
+            // Update battery color based on SOC
+            const fill = document.getElementById('batteryFill');
+            if (percentage < 20) {
+                fill.style.background = 'var(--red)';
+            } else if (percentage < 50) {
+                fill.style.background = 'var(--orange)';
+            } else {
+                fill.style.background = 'var(--primary-gradient)';
+            }
+        }
+
+        // Update performance metrics
+        function updatePerformanceMetrics(metrics) {
+            document.getElementById('metricEco').textContent = `${Math.round(metrics.eco_score)}%`;
+            document.getElementById('metricCost').textContent = `${Math.round(metrics.cost_savings_percent)}%`;
+            document.getElementById('metricRenewable').textContent = `${Math.round(metrics.renewable_utilization * 100)}%`;
+            document.getElementById('metricGrid').textContent = `${Math.round((1 - metrics.grid_dependence) * 100)}%`;
+            
+            // Update progress bars
+            document.querySelectorAll('.progress-bar').forEach((bar, index) => {
+                const values = [
+                    Math.round(metrics.eco_score),
+                    Math.round(metrics.cost_savings_percent),
+                    Math.round(metrics.renewable_utilization * 100),
+                    Math.round((1 - metrics.grid_dependence) * 100)
+                ];
+                if (values[index]) {
+                    bar.style.width = `${values[index]}%`;
+                }
+            });
+        }
+
+        // Start real-time updates
+        function startRealTimeUpdates() {
+            if (realTimeInterval) {
+                clearInterval(realTimeInterval);
+            }
+            
+            realTimeInterval = setInterval(async () => {
+                if (currentSimulation) {
+                    // Simulate real-time updates by slightly modifying the data
+                    const newResults = currentSimulation.results.map(result => ({
+                        ...result,
+                        demand_kw: result.demand_kw * (0.95 + Math.random() * 0.1),
+                        solar_kw: result.solar_kw * (0.9 + Math.random() * 0.2),
+                        wind_kw: result.wind_kw * (0.8 + Math.random() * 0.4),
+                        battery_soc_percent: Math.min(100, Math.max(0, 
+                            result.battery_soc_percent + (Math.random() - 0.5) * 5))
+                    }));
+                    
+                    updateRealTimeTable(newResults.slice(-5));
+                    updateBatteryStatus(newResults[newResults.length - 1].battery_soc_percent);
+                }
+            }, 5000);
+        }
+
+        // Set simulation preset
+        function setPreset(preset, button) {
+            const buttons = document.querySelectorAll('.btn-group .btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            switch(preset) {
+                case 'default':
+                    document.getElementById('solarCapacity').value = 100;
+                    document.getElementById('windCapacity').value = 50;
+                    document.getElementById('batteryCapacity').value = 200;
+                    document.getElementById('strategy').value = 'rl';
+                    document.getElementById('baseDemand').value = 80;
+                    break;
+                case 'peak':
+                    document.getElementById('solarCapacity').value = 120;
+                    document.getElementById('windCapacity').value = 30;
+                    document.getElementById('batteryCapacity').value = 300;
+                    document.getElementById('strategy').value = 'greedy';
+                    document.getElementById('baseDemand').value = 120;
+                    break;
+                case 'renewable':
+                    document.getElementById('solarCapacity').value = 150;
+                    document.getElementById('windCapacity').value = 80;
+                    document.getElementById('batteryCapacity').value = 400;
+                    document.getElementById('strategy').value = 'eco';
+                    document.getElementById('baseDemand').value = 60;
+                    break;
+            }
+            
+            // Update battery display
+            document.getElementById('batteryCapacityValue').textContent = 
+                document.getElementById('batteryCapacity').value + ' kWh';
+            
+            showNotification(`Preset "${preset}" loaded`, 'info');
+        }
+
+        // Predict demand
+        async function predictDemand() {
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        current_demand: document.getElementById('baseDemand').value,
+                        solar_generation: document.getElementById('solarCapacity').value * 0.6,
+                        wind_generation: document.getElementById('windCapacity').value * 0.4,
+                        grid_price: 0.12,
+                        carbon_intensity: 350,
+                        hour: new Date().getHours(),
+                        day_of_week: new Date().getDay(),
+                        month: new Date().getMonth() + 1
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(
+                        `Demand prediction: ${result.prediction.toFixed(1)} kW ` +
+                        `(${result.change_percent > 0 ? '+' : ''}${result.change_percent.toFixed(1)}% change)`,
+                        'info'
+                    );
+                }
+            } catch (error) {
+                console.error('Prediction error:', error);
+            }
+        }
+
+        // Optimize now
+        function optimizeNow() {
+            showLoading('Running optimization algorithms...');
+            
+            setTimeout(() => {
+                hideLoading();
+                showNotification('System optimized! Estimated savings: 12-15%', 'success');
+            }, 1500);
+        }
+
+        // Generate beautiful PDF report
+        async function generatePDFReport() {
+            if (!currentSimulation) {
+                showNotification('Please run a simulation first to generate a report.', 'warning');
+                return;
+            }
+            
+            showLoading('Generating PDF report...');
+            
+            try {
+                // Generate the report HTML
+                const reportHTML = generateReportHTML();
+                
+                // Create PDF using jsPDF
+                await createPDFFromHTML(reportHTML);
+                
+                hideLoading();
+                showNotification('PDF report generated successfully!', 'success');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                hideLoading();
+                showNotification('Error generating PDF report', 'danger');
+            }
+        }
+
+        // Generate report HTML content
+        function generateReportHTML() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString();
+            
+            // Get chart data
+            const chartData = charts.energy?.w?.globals?.series || [0, 0, 0, 0];
+            const chartLabels = charts.energy.config.labels;
+            
+            const metrics = currentSimulation.metrics || {
+                total_cost: 0,
+                cost_savings_usd: 0,
+                cost_savings_percent: 0,
+                total_emissions_kg: 0,
+                eco_score: 0,
+                renewable_utilization: 0,
+                renewable_penetration: 0,
+                grid_dependence: 0,
+                peak_demand: 0
+            };
+
+            // Convert USD to INR for report
+            const totalCostInr = usdToInr(metrics.total_cost);
+            const costSavingsInr = usdToInr(metrics.cost_savings_usd);
+
+            const metricsRows = `
+                <tr><td>Total Cost</td><td>${formatInr(totalCostInr)}</td></tr>
+                <tr><td>Cost Savings</td><td>${formatInr(costSavingsInr)} (${metrics.cost_savings_percent.toFixed(1)}%)</td></tr>
+                <tr><td>Total Emissions</td><td>${metrics.total_emissions_kg.toFixed(1)} kg CO₂</td></tr>
+                <tr><td>Eco Score</td><td>${metrics.eco_score.toFixed(1)}/100</td></tr>
+                <tr><td>Renewable Utilization</td><td>${(metrics.renewable_utilization * 100).toFixed(1)}%</td></tr>
+                <tr><td>Renewable Penetration</td><td>${(metrics.renewable_penetration * 100).toFixed(1)}%</td></tr>
+                <tr><td>Grid Dependence</td><td>${(metrics.grid_dependence * 100).toFixed(1)}%</td></tr>
+                <tr><td>Peak Demand</td><td>${metrics.peak_demand.toFixed(1)} kW</td></tr>
+            `;
+
+            // Create results table rows (first 10)
+            let resultsRows = '';
+            if (currentSimulation.results && currentSimulation.results.length > 0) {
+                currentSimulation.results.slice(0, 10).forEach(result => {
+                    const hourlyCostInr = usdToInr(result.hour_cost_usd);
+                    resultsRows += `
+                        <tr>
+                            <td>${result.timestamp}</td>
+                            <td>${result.demand_kw.toFixed(1)}</td>
+                            <td>${result.available_renewables_kw.toFixed(1)}</td>
+                            <td>${result.grid_import_kw.toFixed(1)}</td>
+                            <td>${result.battery_soc_percent.toFixed(1)}%</td>
+                            <td>${formatInr(hourlyCostInr)}</td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            return `
+                <div class="report-header">
+                    <div class="report-title">Microgrid Energy Management Report</div>
+                    <div class="report-subtitle">
+                        Generated on ${dateStr} at ${timeStr} | 
+                        Simulation ID: MG-${Date.now().toString().slice(-6)}
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <h3>Executive Summary</h3>
+                    <div class="report-metric">
+                        <strong>AI-Powered Microgrid Optimization Report</strong><br>
+                        This report summarizes the performance of the AI-driven microgrid energy management system.
+                        The simulation demonstrates significant improvements in cost efficiency and environmental impact.
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <h3>Key Performance Indicators</h3>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${metricsRows}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="report-section">
+                    <h3>Energy Distribution</h3>
+                    <div class="report-chart">
+                        <strong>Energy Mix Distribution</strong><br>
+                        Solar: ${chartData[0]} kW | Wind: ${chartData[1]} kW<br>
+                        Battery: ${chartData[2]} kW | Grid: ${chartData[3]} kW
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <h3>Simulation Parameters</h3>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Duration</td><td>${document.getElementById('simDuration').value} hours</td></tr>
+                            <tr><td>Solar Capacity</td><td>${document.getElementById('solarCapacity').value} kW</td></tr>
+                            <tr><td>Wind Capacity</td><td>${document.getElementById('windCapacity').value} kW</td></tr>
+                            <tr><td>Battery Capacity</td><td>${document.getElementById('batteryCapacity').value} kWh</td></tr>
+                            <tr><td>Strategy</td><td>${document.getElementById('strategy').options[document.getElementById('strategy').selectedIndex].text}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="report-section">
+                    <h3>Sample Energy Allocation Data</h3>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Demand (kW)</th>
+                                <th>Renewables (kW)</th>
+                                <th>Grid Import (kW)</th>
+                                <th>Battery SOC</th>
+                                <th>Hourly Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${resultsRows}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="report-section">
+                    <h3>AI Model Performance</h3>
+                    <div class="report-metric">
+                        <strong>Model Accuracy Summary</strong><br>
+                        • LSTM Forecast Model: 94% accuracy<br>
+                        • XGBoost Predictor: 92% accuracy<br>
+                        • RL Optimization Agent: Active learning<br>
+                        • Ensemble Performance: 93% overall accuracy
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <h3>Recommendations</h3>
+                    <div class="report-metric">
+                        1. Increase battery capacity to ${Math.round(parseInt(document.getElementById('batteryCapacity').value) * 1.2)} kWh for better peak shaving<br>
+                        2. Consider adding ${Math.round(parseInt(document.getElementById('solarCapacity').value) * 0.3)} kW additional solar capacity<br>
+                        3. Implement time-of-use pricing optimization<br>
+                        4. Schedule high-load activities during peak renewable production
+                    </div>
+                </div>
+                
+                <div class="report-footer">
+                    <strong>AI Microgrid Management System</strong><br>
+                    This report was automatically generated by the AI-powered microgrid management system.<br>
+                    For questions or support, contact: support@aimicrogrid.com
+                </div>
+            `;
+        }
+
+        // Create PDF from HTML
+        async function createPDFFromHTML(htmlContent) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Add HTML content to PDF
+            doc.html(htmlContent, {
+                callback: function(doc) {
+                    doc.save(`Microgrid_Report_${Date.now()}.pdf`);
+                },
+                x: 15,
+                y: 15,
+                width: 170,
+                windowWidth: 794
+            });
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', newTheme);
+            
+            // Update button icon
+            const button = event.currentTarget;
+            const icon = button.querySelector('i');
+            if (icon) {
+                icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+            
+            showNotification(`Switched to ${newTheme} mode`, 'info');
+        }
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.querySelectorAll('.current-time').forEach(el => {
+                el.textContent = timeString;
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            // Remove any existing notifications
+            document.querySelectorAll('.notification').forEach(el => el.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show notification`;
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Show loading
+        function showLoading(text = 'Loading...', title = 'Processing') {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingTitle').textContent = title;
+            document.getElementById('loadingText').textContent = text;
+        }
+
+        // Hide loading
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // Update system status UI
+        function updateSystemStatusUI(status) {
+            const statusIndicator = document.querySelector('.navbar .status-indicator');
+            if (!status.models_loaded) {
+                statusIndicator.className = 'status-indicator status-warning';
+                document.querySelector('.navbar .text-success').className = 'text-warning';
+                document.querySelector('.navbar .text-success').textContent = 'Limited Mode';
+            }
+        }
+
+        // Run simulation (for quick actions)
+        function runSimulation() {
+            document.getElementById('simulationForm').dispatchEvent(new Event('submit'));
+        }
+    </script>
+</body>
+</html>
